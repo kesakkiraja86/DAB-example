@@ -1,0 +1,6 @@
+branch_id,branch_name,city,state,ifsc_code
+B001,Chennai Main,Chennai,TN,BNK0001001
+B002,Mumbai Central,Mumbai,MH,BNK0001002
+B003,Hyderabad Tech Park,Hyderabad,TS,BNK0001003
+B004,Bengaluru Whitefield,Bengaluru,KA,BNK0001004
+B005,Delhi Connaught,Delhi,DL,BNK0001005

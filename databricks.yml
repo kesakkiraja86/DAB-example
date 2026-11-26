@@ -1,0 +1,41 @@
+bundle:
+  name: banking_medallion
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog
+    default: prod_dab
+  schema:
+    description: Schema holding volume, bronze/silver/gold tables and views
+    default: schema_dab
+  volume:
+    description: Volume holding the raw CSV files (under the "raw" folder)
+    default: banking_volume
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://<dev-workspace>.cloud.databricks.com
+    variables:
+      schema: schema_dab_dev
+
+  staging:
+    mode: production
+    workspace:
+      host: https://<staging-workspace>.cloud.databricks.com
+      root_path: ~/.bundle/${bundle.name}/staging
+    variables:
+      schema: schema_dab_stg
+
+  prod:
+    mode: production
+    workspace:
+      host: https://<prod-workspace>.cloud.databricks.com
+      root_path: ~/.bundle/${bundle.name}/prod
+    variables:
+      schema: schema_dab

@@ -1,0 +1,37 @@
+resources:
+  jobs:
+    banking_medallion_job:
+      name: banking-medallion-etl-${bundle.target}
+      max_concurrent_runs: 1
+      schedule:
+        quartz_cron_expression: "0 0 2 * * ?"
+        timezone_id: Asia/Kolkata
+        pause_status: PAUSED
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"
+      tasks:
+        - task_key: bronze_ingest
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/ingest_bronze.py
+            parameters: ["--catalog", "${var.catalog}", "--schema", "${var.schema}", "--volume", "${var.volume}"]
+        - task_key: silver_transform
+          depends_on: [{task_key: bronze_ingest}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/transform_silver.py
+            parameters: ["--catalog", "${var.catalog}", "--schema", "${var.schema}"]
+        - task_key: gold_build
+          depends_on: [{task_key: silver_transform}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/build_gold.py
+            parameters: ["--catalog", "${var.catalog}", "--schema", "${var.schema}"]
+        - task_key: gold_views
+          depends_on: [{task_key: gold_build}]
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/create_views.py
+            parameters: ["--catalog", "${var.catalog}", "--schema", "${var.schema}"]

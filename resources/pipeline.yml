@@ -1,0 +1,27 @@
+resources:
+  pipelines:
+    banking_medallion_pipeline:
+      name: banking-medallion-dlt-${bundle.target}
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      channel: CURRENT
+      development: ${bundle.target == "dev"}
+      continuous: false
+      configuration:
+        catalog: ${var.catalog}
+        schema: ${var.schema}
+        volume: ${var.volume}
+      libraries:
+        - file:
+            path: ../src/pipeline/medallion_pipeline.py
+
+  jobs:
+    banking_dlt_job:
+      name: banking-medallion-dlt-job-${bundle.target}
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: run_medallion_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.banking_medallion_pipeline.id}
+            full_refresh: false
